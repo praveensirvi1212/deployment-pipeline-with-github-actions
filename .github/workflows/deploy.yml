@@ -22,3 +22,10 @@ jobs:
         push: true
         tags: praveensirvi/python-flask-hello-world:latest
     
+    - name: Configure kubectl
+      run: |
+        echo "$KUBECONFIG" > kubeconfig.yaml
+        kubectl config use-context minikube --kubeconfig=kubeconfig.yaml
+    - name: Deploy app
+      run: |
+        kubectl apply -f deployment.yaml --kubeconfig=kubeconfig.yaml
