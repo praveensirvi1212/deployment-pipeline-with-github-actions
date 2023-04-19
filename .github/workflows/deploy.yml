@@ -22,17 +22,14 @@ jobs:
         push: true
         tags: praveensirvi/python-flask-hello-world:latest
     
-    - name: Install kubectl
-      uses: steebchen/kubectl@v1.2.4
-
-    - name: Install Minikube
-      run: |
-        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-        sudo install minikube-linux-amd64 /usr/local/bin/minikube
-
-    - name: Start Minikube
-      run: minikube start
-
-    - name: Deploy app
-      run: kubectl apply -f deployment.yaml
+    - name: Deploy to cluster
+      uses: nickgronow/kubectl@master
+      with:
+        config_data: ${{ secrets.KUBECONFIG }}
+        args: create deployment hello-world --image=praveensirvi/python-flask-hello-world:latest
+    - name: Verify deployment
+      uses: nickgronow/kubectl@master
+      with:
+        config_data: ${{ secrets.KUBECONFIG }}
+        args: '"rollout status deployment/<my-deploy>"'
     
