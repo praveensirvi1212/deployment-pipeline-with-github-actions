@@ -21,20 +21,18 @@ jobs:
         context: .
         push: true
         tags: praveensirvi/python-flask-hello-world:latest
-    - name: Install kubectl 
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'v1.21.3' 
-      id: install
-    - name: Deploy to Kubernetes
-      uses: docker://nickgronow/kubectl:1.17
-      with:
-        args: create deployment hello-world --image=praveensirvi/python-flask-hello-world:latest
-        config_data: ${{ secrets.KUBECONFIG }}
-
-    - name: Verify deployment
-      uses: nickgronow/kubectl@master
-      with:
-        config_data: ${{ secrets.KUBECONFIG }}
-        args: '"rollout status deployment/<my-deploy>"'
-    
+        
+    - name: Start minikube
+      uses: medyagh/setup-minikube@master
+      
+    - name: Try the cluster !
+      run: kubectl get pods -A
+  
+    - name: Deploy to minikube
+      run:
+        kubectl apply -f k8s-node-app.yaml
+        
+    - name: Test service URLs
+      run: |
+          minikube service list
+          minikube service nodejs-app --url
