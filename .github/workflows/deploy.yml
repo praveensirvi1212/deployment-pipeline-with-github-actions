@@ -22,10 +22,28 @@ jobs:
         push: true
         tags: praveensirvi/python-flask-hello-world:latest
     
-    - name: Configure kubectl
-      run: |
-        echo "$KUBECONFIG" > kubeconfig.yaml
-        kubectl config use-context minikube --kubeconfig=kubeconfig.yaml
+    - name: Set up Kubernetes environment
+      uses: engineerd/setup-kubectl@v1.0.1
+      with:
+          kubeconfig: |
+            apiVersion: v1
+            kind: Config
+            clusters:
+            - name: minikube
+              cluster:
+                server: https://192.168.49.2:8443
+                certificate-authority: /home/praveen/.minikube/ca.crt
+            contexts:
+            - name: minikube
+              context:
+                cluster: minikube
+                user: minikube
+            current-context: minikube
+            users:
+            - name: minikube
+              user:
+                client-certificate: /home/praveen/.minikube/profiles/minikube/client.crt
+                client-key: /home/praveen/.minikube/profiles/minikube/client.key
     - name: Deploy app
       run: |
-        kubectl apply -f deployment.yaml --kubeconfig=kubeconfig.yaml
+        kubectl apply -f deployment.yaml 
